@@ -1,0 +1,28 @@
+hotel model 
+region [central - eastern - western - south west - north east - northern - north west]
+  - Cities
+    - Hotels
+
+
+Hotel
+  -name
+  -location
+  -address
+  -region
+  -images
+  -coverimage
+  -description
+  -summary
+  -facilities
+  -languages
+  -availability
+  -prices
+  -avgPrice
+  -rating
+    -facilities
+    -scenary
+    -staff
+    -food
+  -reviews
+  -rules
+
