@@ -12,10 +12,12 @@ import {
   getHotelAnalytics,
 } from "../controllers/hotel.controller";
 import { getMonthlyPlan } from "../controllers/analytics.controller";
+import upload from "../utils/upload";
 
 import reviewRouter from "./review.routes";
 import viewsRouter from "./views.routes";
 import bookingRouter from "./booking.routes";
+import { protect, restrictTo } from "../controllers/auth.controller";
 
 const router = express.Router();
 
@@ -28,6 +30,7 @@ router.route("/").get(getAllHotels).post(createHotel);
 router.route("/top-5-cheap").get(topFiveHotels, getAllHotels);
 router.route("/analytics").get(getHotelAnalytics);
 router.route("monthly-plan/:year").get(getMonthlyPlan);
+router.route("/upload-hotel-image").get(upload);
 
 router
   .route("/within-radius/:distance/center/:pin/unit/:unit")
