@@ -8,10 +8,11 @@
     "build": "babel src/ --out-dir dist/ --copy-files",
     "test": "jest",
     "coveralls": "jest --coverage && coveralls < coverage/lcov.info",
-    "deploy": "git push --all && git push heroku develop:master"
+    "deploy": "git push --all && git push heroku backend:master"
   },
   "private": true,
   "dependencies": {
+    "@babel/runtime": "^7.9.6",
     "aws-sdk": "^2.665.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
@@ -39,7 +40,6 @@
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-flow": "^7.9.0",
     "@babel/preset-typescript": "^7.9.0",
-    "@babel/runtime": "^7.9.6",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-polyfill": "^6.26.0",
     "eslint": "^6.8.0",
