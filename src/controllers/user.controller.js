@@ -1,11 +1,11 @@
 const catchAsync = require("../utils/catchAsync"); // Error Handling wrapper for aysnc operations
 const AppError = require("../utils/app-error"); // Custom Error Handling Class
 const User = require("../models/user.model");
-const resHandler = require("../controllers/responseHandler");
+const resHandler = require("./responseHandler");
 
 const filterRequestBody = (inputData, ...allowedFields) => {
   const fields = {};
-  Object.keys(inputData).forEach(el => {
+  Object.keys(inputData).forEach((el) => {
     if (allowedFields.includes(el)) fields[el] = inputData[el];
   });
   return fields;
@@ -53,8 +53,8 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      user
-    }
+      user,
+    },
   });
 });
 
@@ -62,6 +62,6 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user.id, { active: false });
   res.status(204).json({
     status: "success",
-    data: null
+    data: null,
   });
 });
