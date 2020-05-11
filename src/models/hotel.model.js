@@ -49,8 +49,6 @@ const hotelSchema = mongoose.Schema(
 
     ratings: Number, // Number of ratings
 
-    reviews: [{ type: mongoose.Schema.ObjectId, ref: "Review" }],
-
     rules: [String],
 
     views: Number,
