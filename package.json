@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "scripts": {
     "start": "node server",
-    "start:dev": "nodemon server",
+    "lint": "eslint .",
+    "start:dev": "nodemon --exec babel-node server.js",
     "build": "git push --all && git push heroku develop:master"
   },
   "private": true,
@@ -23,10 +24,16 @@
     "mongoose": "^5.9.10",
     "nodemailer": "^6.4.6",
     "pug": "^2.0.4",
+    "slugify": "^1.4.0",
     "validator": "^13.0.0",
     "xss-clean": "^0.1.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-flow": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb": "^18.1.0",
     "eslint-config-prettier": "^6.11.0",

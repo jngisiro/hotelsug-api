@@ -1,18 +1,20 @@
-const express = require("express");
-const rateLimit = require("express-rate-limit");
-const helmet = require("helmet");
-const cors = require("cors");
-const mongoSanitize = require("express-mongo-sanitize");
-const xss = require("xss-clean");
-const hpp = require("hpp");
-const cookieParser = require("cookie-parser");
+import express from "express";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import cors from "cors";
+import mongoSanitize from "express-mongo-sanitize";
+import xss from "xss-clean";
+import hpp from "hpp";
+import cookieParser from "cookie-parser";
+
+import userRouter from "./routes/user.routes";
+import hotelRouter from "./routes/hotel.routes";
+import reviewRouter from "./routes/review.routes";
+import locationRouter from "./routes/location.routes";
+import AppError from "./utils/app-error";
+import globalErrorHandler from "./controllers/error.controller";
 
 const app = express();
-const userRouter = require("./routes/user.routes");
-const hotelRouter = require("./routes/hotel.routes");
-const reviewRouter = require("./routes/review.routes");
-const AppError = require("./utils/app-error");
-const globalErrorHandler = require("./controllers/error.controller");
 
 // handle rate limit with express-rate-limit
 const limiter = rateLimit({
@@ -57,8 +59,8 @@ app.use("/api/v1/hotel", hotelRouter);
 // User routes
 app.use("/api/v1/users", userRouter);
 
-// Transaction Routes
-// app.use("/api/v1/transactions", transactionRouter);
+// Location Routes
+app.use("/api/v1/locations", locationRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find route: ${req.originalUrl}`, 400));
@@ -67,4 +69,4 @@ app.all("*", (req, res, next) => {
 // Error handling
 app.use(globalErrorHandler);
 
-module.exports = app;
+export default app;

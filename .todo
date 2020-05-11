@@ -25,4 +25,22 @@ Hotel
     -food
   -reviews
   -rules
+  -views
+
+
+USER
+ - Bookings (few) booking id
+ - Favourites (many)
+ - Reviews (many)
+
+LOCATION
+  - HOTEL (many)
+    - REVIEW (many)
+
+BOOKING 
+ - start date
+ - end date
+ - user id
+ - hotel id
+ - payment type
 

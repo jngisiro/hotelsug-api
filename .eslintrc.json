@@ -1,22 +1,29 @@
 {
   "parserOptions": {
-    "ecmaVersion": 8,
+    "ecmaVersion": 2018,
     "sourceType": "module",
     "ecmaFeatures": {
-      "jsx": true,
+      // "jsx": true
       "experimentalObjectRestSpread": true
     }
   },
-  "extends": ["airbnb", "prettier", "plugin:node/recommended"],
+  "extends": [
+    "airbnb",
+    "prettier",
+    "plugin:node/recommended",
+    "plugin:import/warnings"
+  ],
   "plugins": ["prettier"],
   "rules": {
-    "prettier/prettier": "error",
+    "prettier/prettier": "off",
     "spaced-comment": "off",
     "no-console": "warn",
     "consistent-return": "off",
     "func-names": "off",
     "object-shorthand": "off",
     "no-process-exit": "off",
+    "import/prefer-default-export": "off",
+    "node/no-unsupported-features/es-syntax": "off",
     "no-param-reassign": "off",
     "no-return-await": "off",
     "no-underscore-dangle": "off",

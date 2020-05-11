@@ -1,5 +1,7 @@
-const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+import app from "./app";
 
 // Saftety net handle unexpected programming errors
 process.on("uncaughtException", (err) => {
@@ -13,7 +15,7 @@ if (process.env.NODE_ENV === "test")
 else dotenv.config({ path: "./config.env" });
 //const DB = process.env.DATABASE.replace("<PASSWORD>", process.env.PASSWORD);
 
-const DB = process.env.DATABASE;
+const DB = process.env.DATABASE_LOCAL;
 
 mongoose
   .connect(DB, {
@@ -24,8 +26,6 @@ mongoose
   })
   .then((con) => console.log("Successful Database Connection"))
   .catch((err) => console.log(err));
-
-const app = require("./app");
 
 const PORT = process.env.PORT || 8000;
 
