@@ -55,5 +55,6 @@ export default class Features {
     const skip = (page - 1) * limit;
 
     this.query.skip(skip).limit(limit);
+    return this;
   }
 }
