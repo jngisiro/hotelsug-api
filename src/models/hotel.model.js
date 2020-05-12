@@ -30,7 +30,10 @@ const hotelSchema = mongoose.Schema(
       required: [true, "Provide the Hotel summary"],
     },
 
-    facilities: [String],
+    facilities: {
+      type: [String],
+      trim: true,
+   },
 
     languages: [String],
 

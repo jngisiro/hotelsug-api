@@ -16,7 +16,6 @@ export const topFiveHotels = (req, res, next) => {
 };
 
 export const getAllHotels = catchAsync(async (req, res, next) => {
-  console.log(req.cookies);
 
   const features = new Features(Hotel.find(), req.query)
     .filter()

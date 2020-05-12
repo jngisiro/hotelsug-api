@@ -14,7 +14,7 @@ const router = express.Router();
 router
   .route("/")
   .get(getAllLocations)
-  .post(protect, restrictTo("admin"), createLocation);
+  .post(createLocation);
 
 router
   .route("/:id")
