@@ -12,7 +12,7 @@ const getSignedUrl = (req, res) => {
   s3.getSignedUrl(
     "putObject",
     {
-      Bucket: "hotels.ug",
+      Bucket: "hotelbucket",
       ContentType: "image/jpeg",
       Key: key,
     },
