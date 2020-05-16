@@ -1,4 +1,5 @@
 import AWS from "aws-sdk";
+import { v1 } from "uuid";
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -6,7 +7,7 @@ const s3 = new AWS.S3({
 });
 
 const getSignedUrl = (req, res) => {
-  const key = `cover-${req.params.email}/.jpeg`;
+  const key = `cover-${v1()}.jpeg`;
 
   s3.getSignedUrl(
     "putObject",
