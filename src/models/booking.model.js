@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const BookingSchema = new mongoose.Schema({
+const bookingSchema = new mongoose.Schema({
   bookingDate: String,
   expiration: String,
   amount: Number,
@@ -11,3 +11,5 @@ const BookingSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.ObjectId, ref: "User" },
   hotel: { type: mongoose.Schema.ObjectId, ref: "Hotel" },
 });
+
+export default mongoose.model("Booking", bookingSchema)
