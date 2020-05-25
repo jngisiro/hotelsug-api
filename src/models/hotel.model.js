@@ -12,6 +12,11 @@ const hotelSchema = mongoose.Schema(
       minlength: [10, "Name must have more than 10 characters"],
     },
 
+    location: {
+      type: String,
+      required: [true, "Hotel must have a location"],
+    },
+
     slug: String,
 
     images: { type: [String] },
@@ -52,9 +57,14 @@ const hotelSchema = mongoose.Schema(
 
     ratings: Number, // Number of ratings
 
+    supportedPayments: {
+      type: [String],
+      default: ["Mobile Money"],
+    },
+
     rules: [String],
 
-    location: {
+    address: {
       type: {
         type: String,
         default: "Point",
