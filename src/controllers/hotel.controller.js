@@ -16,7 +16,6 @@ export const topFiveHotels = (req, res, next) => {
 };
 
 export const getAllHotels = catchAsync(async (req, res, next) => {
-
   const features = new Features(Hotel.find(), req.query)
     .filter()
     .sort()
@@ -35,8 +34,8 @@ export const getHotel = catchAsync(async (req, res) => {
   const hotel = await Hotel.findById(req.params.id)
     .populate("reviews")
     .populate("bookings")
-    .populate("favourites")
-    .populate("views");
+    .populate("views")
+    .populate("favs");
 
   return res.status(200).json({
     status: "sucess",

@@ -33,7 +33,7 @@ const hotelSchema = mongoose.Schema(
     facilities: {
       type: [String],
       trim: true,
-   },
+    },
 
     languages: [String],
 
@@ -53,8 +53,6 @@ const hotelSchema = mongoose.Schema(
     ratings: Number, // Number of ratings
 
     rules: [String],
-
-    views: Number,
 
     location: {
       type: {
@@ -117,12 +115,16 @@ hotelSchema.virtual("bookings", {
   localField: "_id",
 });
 
-hotelSchema.virtual("favourites", {
-  ref: "Favourite",
+hotelSchema.virtual("favs", {
+  ref: "Favs",
   foreignField: "hotel",
   localField: "_id",
 });
 
-hotelSchema.post("save", function (next) {});
+hotelSchema.virtual("views", {
+  ref: "Views",
+  foreignField: "hotel",
+  localField: "_id",
+});
 
 export default mongoose.model("Hotel", hotelSchema);

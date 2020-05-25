@@ -17,6 +17,7 @@ import upload from "../utils/upload";
 import reviewRouter from "./review.routes";
 import viewsRouter from "./views.routes";
 import bookingRouter from "./booking.routes";
+import favouritesRouter from "./favourites.routes";
 import { protect, restrictTo } from "../controllers/auth.controller";
 
 const router = express.Router();
@@ -24,6 +25,7 @@ const router = express.Router();
 router.use("/:hotelId/review", reviewRouter);
 router.use("/:hotelId/views", viewsRouter);
 router.use("/:hotelId/bookings", bookingRouter);
+router.use("/:hotelId/favourites", favouritesRouter);
 
 router.route("/").get(getAllHotels).post(createHotel);
 

@@ -1,4 +1,4 @@
-import Favourite from "../models/favourites.model";
+import Favourite from "../models/favs.model";
 import catchAsync from "../utils/catchAsync";
 import AppError from "../utils/app-error";
 
