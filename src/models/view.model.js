@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const viewSchema = mongoose.Schema({
+const viewSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
@@ -9,3 +9,6 @@ const viewSchema = mongoose.Schema({
   hotel: { type: mongoose.Schema.ObjectId, ref: "Hotel" },
   user: { type: mongoose.Schema.ObjectId, ref: "User" },
 });
+
+
+export default mongoose.model("Views", viewSchema);

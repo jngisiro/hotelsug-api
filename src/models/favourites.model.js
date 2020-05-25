@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const favouriteSchema = mongoose.Schema({
+const favouriteSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now(),
