@@ -77,6 +77,11 @@ const hotelSchema = mongoose.Schema(
       ordinary: Number,
     },
 
+    role: {
+      type: String,
+      default: "manager",
+    },
+
     rating: Number, // The average rating
 
     ratings: Number, // Number of ratings

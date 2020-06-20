@@ -31,6 +31,17 @@ export const getAllHotels = catchAsync(async (req, res, next) => {
 });
 
 export const getHotel = catchAsync(async (req, res) => {
+  const hotel = await Hotel.findById(req.params.id).populate("reviews");
+
+  return res.status(200).json({
+    status: "sucess",
+    data: {
+      hotel,
+    },
+  });
+});
+
+export const me = catchAsync(async (req, res) => {
   const hotel = await Hotel.findById(req.params.id)
     .populate("reviews")
     .populate("bookings")

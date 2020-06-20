@@ -18,7 +18,14 @@ import reviewRouter from "./review.routes";
 import viewsRouter from "./views.routes";
 import bookingRouter from "./booking.routes";
 import favouritesRouter from "./favourites.routes";
-import { protect, restrictTo } from "../controllers/hotelAuth.controllers";
+import {
+  protect,
+  restrictTo,
+  login,
+  logout,
+  signup,
+  me,
+} from "../controllers/hotelAuth.controllers";
 
 const router = express.Router();
 
@@ -30,6 +37,11 @@ router.use("/:hotelId/favourites", favouritesRouter);
 router.route("/").get(getAllHotels).post(createHotel);
 
 router.route("/top-5-cheap").get(topFiveHotels, getAllHotels);
+router.route("/me").get(protect, restrictTo("manager"), me);
+router.route("/login").post(login);
+router.route("/signup").post(signup);
+router.route("/logout").post(logout);
+
 router.route("/analytics").get(getHotelAnalytics);
 router.route("monthly-plan/:year").get(getMonthlyPlan);
 router.route("/upload-hotel-image").get(upload);
