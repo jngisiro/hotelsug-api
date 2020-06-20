@@ -18,7 +18,7 @@ import reviewRouter from "./review.routes";
 import viewsRouter from "./views.routes";
 import bookingRouter from "./booking.routes";
 import favouritesRouter from "./favourites.routes";
-import { protect, restrictTo } from "../controllers/auth.controller";
+import { protect, restrictTo } from "../controllers/hotelAuth.controllers";
 
 const router = express.Router();
 

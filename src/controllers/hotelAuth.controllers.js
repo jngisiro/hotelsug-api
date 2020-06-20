@@ -2,7 +2,7 @@ const { promisify } = require("util");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const User = require("../models/user.model");
+const Hotel = require("../models/hotel.model");
 const catchAsync = require("../utils/catchAsync");
 const AppError = require("../utils/app-error");
 const Email = require("../utils/email");
@@ -13,9 +13,9 @@ const signToken = (id) => {
   });
 };
 
-const createAuthToken = (user, statusCode, res) => {
-  // Generate auth token using new user's id
-  const token = signToken(user._id);
+const createAuthToken = (hotel, statusCode, res) => {
+  // Generate auth token using new hotel's id
+  const token = signToken(hotel._id);
   const expiresIn = new Date(
     new Date().getTime() + process.env.JWT_COOKIE_EXPIRES * 60 * 60 * 1000
   );
@@ -29,42 +29,39 @@ const createAuthToken = (user, statusCode, res) => {
 
   res.cookie("jwt", token, cookieOptions);
 
-  // Hide password from the returned user data
-  user.password = undefined;
+  // Hide password from the returned hotel data
+  hotel.password = undefined;
 
   res.status(statusCode).json({
     status: "Success",
     token,
     expiresIn,
     data: {
-      user,
+      hotel,
     },
   });
 };
 
 exports.signup = catchAsync(async (req, res, next) => {
   // Check if email is already registered
-  const user = await User.findOne({ email: req.body.email });
+  const hotel = await Hotel.findOne({ email: req.body.email });
 
-  if (user) return next(new AppError("Email is already registered", 403));
+  if (hotel)
+    return next(
+      new AppError("Hotel with that email is already registered", 403)
+    );
 
-  const newUser = await User.create({
-    firstname: req.body.firstname,
-    lastname: req.body.lastname,
-    email: req.body.email,
-    password: req.body.password,
-    passwordConfirm: req.body.passwordConfirm,
-  });
+  const newHotel = await Hotel.create(req.body);
 
   // Generate account activation token
-  const token = newUser.createToken("confirmAccount");
-  await newUser.save({ validateBeforeSave: false });
+  const token = newHotel.createToken("confirmAccount");
+  await newHotel.save({ validateBeforeSave: false });
 
   const confirmationUrl = `${req.protocol}://${req.get(
     "host"
-  )}/api/v1/users/confirmAccount/${token}`;
+  )}/api/v1/hotels/confirmAccount/${token}`;
 
-  await new Email(newUser, confirmationUrl).sendWelcome();
+  await new Email(newHotel, confirmationUrl).sendHotelWelcome();
 
   res.status(201).json({
     status: "Success",
@@ -81,18 +78,18 @@ exports.confirmAccout = catchAsync(async (req, res, next) => {
     .update(req.params.token)
     .digest("hex");
 
-  const user = await User.findOne({
+  const hotel = await Hotel.findOne({
     confirmAccountToken: hashedToken,
     confirmAccountExpires: { $gt: Date.now() },
   });
 
-  // If there is no user, then the token is invalid or has expired
-  if (!user) return next(new AppError("Token is invalid or has expired", 400));
+  // If there is no hotel, then the token is invalid or has expired
+  if (!hotel) return next(new AppError("Token is invalid or has expired", 400));
 
-  user.accountActivated = true;
-  user.confirmAccountToken = undefined;
-  user.confirmAccountExpires = undefined;
-  await user.save({ validateBeforeSave: false });
+  hotel.accountActivated = true;
+  hotel.confirmAccountToken = undefined;
+  hotel.confirmAccountExpires = undefined;
+  await hotel.save({ validateBeforeSave: false });
 
   const redirectUrl = `https://youthful-poincare-7c7cce.netlify.app/confirmAccount`;
 
@@ -107,20 +104,15 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!email || !password)
     return next(new AppError("Email and Password required", 400));
 
-  // Check if the user exists && password is correct
-  const user = await User.findOne({ email })
-    .select("+password") // +password to select field not selected by default
-    .populate("reviews")
-    .populate("bookings")
-    .populate("views")
-    .populate("favs");
+  // Check if the hotel exists && password is correct
+  const hotel = await Hotel.findOne({ email }).select("+password"); // +password to select field not selected by default
 
-  if (!user || !(await user.correctPassword(password, user.password)))
+  if (!hotel || !(await hotel.correctPassword(password, hotel.password)))
     // If call to compare passwords returns false generate AppError
     return next(new AppError("Incorrect Email or Password", 401));
 
   // If everything is ok, send jwt back to client
-  createAuthToken(user, 200, res);
+  createAuthToken(hotel, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -141,19 +133,21 @@ exports.protect = catchAsync(async (req, res, next) => {
   // Verify the token. jwt.verify requires a callback which is converted to an async function using promisify
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
-  // Check if user still exists
-  const checkUser = await User.findById(decoded.id);
-  if (!checkUser)
-    return next(new AppError("User no longer exists. Please login again", 401));
-
-  // Check if user changed password after the token was issued
-  if (checkUser.changedPasswordAfterToken(decoded.iat))
+  // Check if hotel still exists
+  const checkHotel = await Hotel.findById(decoded.id);
+  if (!checkHotel)
     return next(
-      new AppError("User recently changed password, Please login again", 401)
+      new AppError("Hotel no longer exists. Please login again", 401)
+    );
+
+  // Check if hotel's password changed after the token was issued
+  if (checkHotel.changedPasswordAfterToken(decoded.iat))
+    return next(
+      new AppError("Hotel's password recently changed, Please login again", 401)
     );
 
   // GRANT ACCESS TO PROTECTED ROUTE
-  req.user = checkUser;
+  req.hotel = checkHotel;
   next();
 });
 
@@ -167,7 +161,6 @@ exports.logout = (req, res) => {
   res.status(200).json({ status: "success" });
 };
 
-// Restrict certain routes to authorized user roles
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     // roles ["user", "admin", "superadmin", "gm", "manager", "attendant"]
@@ -183,30 +176,30 @@ exports.restrictTo = (...roles) => {
 // Handle forgotten password
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // Check if user is registered with provided email
-  const user = await User.findOne({ email: req.body.email });
-  if (!user)
-    return next(new AppError("There is no user with that email address", 404));
+  const hotel = await Hotel.findOne({ email: req.body.email });
+  if (!hotel)
+    return next(new AppError("There is no hotel with that email address", 404));
 
   // Generate random reset token
-  const resetToken = user.createToken("resetPassword");
-  await user.save({ validateBeforeSave: false });
+  const resetToken = hotel.createToken("resetPassword");
+  await hotel.save({ validateBeforeSave: false });
 
   try {
     // Send the token back as reset link
     const resetURL = `${req.protocol}://${req.get(
       "host"
-    )}/api/v1/users/resetPassword/${resetToken}}`;
+    )}/api/v1/hotels/resetPassword/${resetToken}}`;
 
-    await new Email(user, resetURL).sendPasswordReset();
+    await new Email(hotel, resetURL).sendPasswordReset();
 
     res.status(200).json({
       status: "Success",
       message: "Reset token sent to email address",
     });
   } catch (err) {
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save({ validateBeforeSave: false });
+    hotel.passwordResetToken = undefined;
+    hotel.passwordResetExpires = undefined;
+    await hotel.save({ validateBeforeSave: false });
 
     return next(new AppError("Error sending email. Try again later", 500));
   }
@@ -221,38 +214,38 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     .digest("hex");
 
   // get user with the hashed token and check if token hasn't yet expiried
-  const user = await User.findOne({
+  const hotel = await Hotel.findOne({
     passwordResetToken: hashedToken,
     passwordResetExpires: { $gt: Date.now() },
   });
 
   // If there is no user, then the token is invalid or has expired
-  if (!user) return next(new AppError("Token is invalid or has expired", 400));
+  if (!hotel) return next(new AppError("Token is invalid or has expired", 400));
 
   // Update user's new password and delete the reset token and reset exipry
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.password;
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
+  hotel.password = req.body.password;
+  hotel.passwordConfirm = req.body.password;
+  hotel.passwordResetToken = undefined;
+  hotel.passwordResetExpires = undefined;
+  await hotel.save();
 
-  // Sign in user and send an auth token
-  createAuthToken(user, 200, res);
+  // Sign in hotel and send an auth token
+  createAuthToken(hotel, 200, res);
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  // Get user
-  const user = await User.findById(req.user.id).select("+password");
+  // Get hotel
+  const hotel = await Hotel.findById(req.user.id).select("+password");
 
   // Check is previous password ic correct
-  if (!(await user.correctPassword(req.body.currentPassword, user.password)))
+  if (!(await hotel.correctPassword(req.body.currentPassword, hotel.password)))
     return next(new AppError("Current password is incorrect", 401));
 
   // Update to new password
-  user.password = req.body.password;
-  user.passwordConfirm = req.body.passwordConfirm;
-  await user.save();
+  hotel.password = req.body.password;
+  hotel.passwordConfirm = req.body.passwordConfirm;
+  await hotel.save();
 
   // Send new auth tokrn
-  createAuthToken(user, 200, res);
+  createAuthToken(hotel, 200, res);
 });

@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
+import validator from "validator";
+import bcrypt from "bcryptjs";
+import crypto from "crypto";
 
 const hotelSchema = mongoose.Schema(
   {
@@ -19,6 +22,31 @@ const hotelSchema = mongoose.Schema(
 
     slug: String,
 
+    email: {
+      type: String,
+      required: [true, "Hotel Email Address is required"],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, "Please provide a valid email"],
+    },
+
+    contactNumber: {
+      type: String,
+      required: [true, "Provide a contact number"],
+    },
+
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+
+    passwordConfirm: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+
+    website: String,
+
     images: { type: [String] },
 
     coverImage: { type: String },
@@ -29,12 +57,6 @@ const hotelSchema = mongoose.Schema(
       required: [true, "Provide the Hotel description"],
     },
 
-    summary: {
-      type: String,
-      trim: true,
-      required: [true, "Provide the Hotel summary"],
-    },
-
     facilities: {
       type: [String],
       trim: true,
@@ -42,15 +64,17 @@ const hotelSchema = mongoose.Schema(
 
     languages: [String],
 
-    availability: Boolean,
+    availability: {
+      type: Boolean,
+      default: true,
+    },
 
     active: false,
 
     price: {
-      avgPrice: Number,
       deluxe: Number,
-      Suite: Number,
-      Ordinary: Number,
+      double: Number,
+      ordinary: Number,
     },
 
     rating: Number, // The average rating
@@ -59,7 +83,6 @@ const hotelSchema = mongoose.Schema(
 
     supportedPayments: {
       type: [String],
-      default: ["Mobile Money"],
     },
 
     rules: [String],
@@ -71,12 +94,12 @@ const hotelSchema = mongoose.Schema(
         enum: ["Point"],
       },
       coordinates: [Number],
-      address: {
+      location: {
         type: String,
         trim: true,
         required: [true, "Provide the Hotel location"],
       },
-      description: {
+      fullAddress: {
         type: String,
         trim: true,
         required: [true, "Provide the Hotel address"],
@@ -103,10 +126,75 @@ const hotelSchema = mongoose.Schema(
   }
 );
 
+// This function runs everytime a new document is created or saved in the database
+hotelSchema.pre("save", async function (next) {
+  // check if the password field has been modified before running the hash or exiting if not
+  if (!this.isModified("password")) return next();
+
+  // Password hashed
+  this.password = await bcrypt.hash(this.password, 12);
+
+  // Ignores / deletes the passwordconfirm field
+  this.passwordConfirm = undefined;
+
+  // Onto the next middleware
+  next();
+});
+
+hotelSchema.pre("save", function (next) {
+  if (!this.isModified("password") || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 hotelSchema.pre("save", function (next) {
   this.slug = slugify(this.name, { lower: true });
   next();
 });
+
+hotelSchema.methods.correctPassword = async function (
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+// eslint-disable-next-line camelcase
+hotelSchema.methods.changedPasswordAfterToken = function (JWT_timeStamp) {
+  // Check if user has chnaged password
+  if (this.passwordChangedAt) {
+    const changedTimeStamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    // eslint-disable-next-line camelcase
+    return JWT_timeStamp < changedTimeStamp;
+  }
+
+  // False means password not changed after token was issued
+  return false;
+};
+
+hotelSchema.methods.createToken = function (operation) {
+  const token = crypto.randomBytes(32).toString("hex");
+
+  if (operation === "confirmAccount") {
+    this.confirmAccountToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    this.confirmAccountExpires = Date.now() + 60 * 60 * 1000;
+  } else {
+    this.passwordResetToken = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+    this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  }
+
+  return token;
+};
 
 hotelSchema.pre(/^find/, function (next) {
   this.find({ active: { $ne: false } });

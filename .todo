@@ -1,46 +1,15 @@
-hotel model 
-region [central - eastern - western - south west - north east - northern - north west]
-  - Cities
-    - Hotels
+icons
+ - down carret
+ - forward & backwards carrets
+ - avator
+ - location
+ - cash
+ - fav 
+ - add 
+ - subtract
+ - search icon
 
-
-Hotel
-  -name
-  -location
-  -address
-  -region
-  -images
-  -coverimage
-  -description
-  -summary
-  -facilities
-  -languages
-  -availability
-  -prices
-  -avgPrice
-  -rating
-    -facilities
-    -scenary
-    -staff
-    -food
-  -reviews
-  -rules
-  -views
-
-
-USER
- - Bookings (few) booking id
- - Favourites (many)
- - Reviews (many)
-
-LOCATION
-  - HOTEL (many)
-    - REVIEW (many)
-
-BOOKING 
- - start date
- - end date
- - user id
- - hotel id
- - payment type
-
+Server Hosting
+FrontEnd Hosting
+Image Hosting
+Email Hosting
