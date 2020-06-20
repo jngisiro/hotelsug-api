@@ -1,11 +1,11 @@
-const { promisify } = require("util");
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
+import { promisify } from "util";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
-const Hotel = require("../models/hotel.model");
-const catchAsync = require("../utils/catchAsync");
-const AppError = require("../utils/app-error");
-const Email = require("../utils/email");
+import Hotel from "../models/hotel.model";
+import catchAsync from "../utils/catchAsync";
+import AppError from "../utils/app-error";
+import Email from "../utils/email";
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
