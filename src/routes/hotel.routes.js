@@ -10,6 +10,7 @@ import {
   deleteHotel,
   topFiveHotels,
   getHotelAnalytics,
+  me,
 } from "../controllers/hotel.controller";
 import { getMonthlyPlan } from "../controllers/analytics.controller";
 import upload from "../utils/upload";
@@ -24,7 +25,6 @@ import {
   login,
   logout,
   signup,
-  me,
 } from "../controllers/hotelAuth.controllers";
 
 const router = express.Router();
@@ -37,7 +37,7 @@ router.use("/:hotelId/favourites", favouritesRouter);
 router.route("/").get(getAllHotels).post(createHotel);
 
 router.route("/top-5-cheap").get(topFiveHotels, getAllHotels);
-router.route("/me").get(protect, restrictTo("manager"), me);
+router.route("/me").get(me);
 router.route("/login").post(login);
 router.route("/signup").post(signup);
 router.route("/logout").post(logout);
