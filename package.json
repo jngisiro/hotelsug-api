@@ -1,0 +1,62 @@
+{
+  "name": "hotelsug",
+  "version": "0.0.0",
+  "scripts": {
+    "start": "node dist/server",
+    "lint": "eslint src/",
+    "start:dev": "nodemon --exec babel-node src/server.js",
+    "build": "babel src/ --out-dir dist/ --copy-files",
+    "test": "jest",
+    "coveralls": "jest --coverage && coveralls < coverage/lcov.info",
+    "deploy": "git push --all && git push heroku backend:master"
+  },
+  "private": true,
+  "dependencies": {
+    "@babel/runtime": "^7.9.6",
+    "aws-sdk": "^2.665.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-mongo-sanitize": "^2.0.0",
+    "express-rate-limit": "^5.1.1",
+    "helmet": "^3.22.0",
+    "hpp": "^0.2.3",
+    "html-to-text": "^5.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.9.10",
+    "nodemailer": "^6.4.6",
+    "pug": "^2.0.4",
+    "slugify": "^1.4.0",
+    "uuid": "^8.0.0",
+    "validator": "^13.0.0",
+    "xss-clean": "^0.1.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.6",
+    "@babel/node": "^7.8.7",
+    "@babel/plugin-transform-runtime": "^7.9.6",
+    "@babel/preset-env": "^7.9.6",
+    "@babel/preset-flow": "^7.9.0",
+    "@babel/preset-typescript": "^7.9.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-polyfill": "^6.26.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "^7.19.0",
+    "jasmine-core": "~3.4.0",
+    "jasmine-spec-reporter": "~4.2.1",
+    "nodemon": "^2.0.3",
+    "prettier": "^2.0.5"
+  },
+  "engines": {
+    "node": "10.16.0"
+  }
+}
